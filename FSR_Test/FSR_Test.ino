@@ -9,8 +9,10 @@ int fsrPin = 0; // the FSR and 10K pulldown are connected to a0
 int fsrReading; // the analog reading from the FSR resistor divider
 int fsrVoltage; // the analog reading converted to voltage
 
-int LEDpin = 11;
+int LEDpinRed = 11; // Pressure
 int LEDbrightness; // brightness of LED
+
+int LEDpinGreen = 12; // No pressure
 
 unsigned long fsrResistance; // The voltage converted to resistance, can be very big so make "long"
 unsigned long fsrConductance;
@@ -18,6 +20,7 @@ long fsrForce; // Finally, the resistance converted to force
 
 void setup(void) {
     Serial.begin(9600); // We'll send debugging information via the Serial monitor
+    pinMode(LEDpinGreen, OUTPUT);
 }
 
 void loop(void) {
@@ -30,7 +33,9 @@ void loop(void) {
     Serial.println(fsrVoltage);
     if (fsrVoltage == 0) {
         Serial.println("No pressure");
+        digitalWrite(LEDpinGreen, HIGH);
     } else {
+        digitalWrite(LEDpinGreen, LOW);
         // The voltage = Vcc * R / (R + FSR) where R = 10K and Vcc = 5V
         // so FSR = ((Vcc - V) * R) / V yay math!
         fsrResistance = 5000 - fsrVoltage; // fsrVoltage is in millivolts so 5V = 5000mV
@@ -61,7 +66,7 @@ void loop(void) {
     // used by analogWrite (0-255) with map!
     LEDbrightness = map(fsrReading, 0, 1023, 0, 255);
     // LED gets brighter the harder you press
-    analogWrite(LEDpin, LEDbrightness);
+    analogWrite(LEDpinRed, LEDbrightness);
     
     delay(1000);
 }
